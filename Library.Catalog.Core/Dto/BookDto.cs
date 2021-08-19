@@ -4,6 +4,7 @@ namespace Library.Catalog.Core.Dto
 {
 	public class BookDto
 	{
+		public int Id { get; set; }
 		public string Name { get; set; }
 		public List<AuthorDto> Authors { get; set; }
 		public string City { get; set; }

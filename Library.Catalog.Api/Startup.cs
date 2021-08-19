@@ -1,4 +1,7 @@
+using Library.Catalog.Api.AppStart;
 using Library.Catalog.Core.Contracts;
+using Library.Catalog.DAL;
+using Library.Catalog.Service;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -19,9 +22,10 @@ namespace Library.Catalog.Api
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
+			services.AddAutoMapper();
+			services.AddScoped<ICatalogService,CatalogService>();
+			services.AddScoped<ICatalogRepository, CatalogRepository>();
 			services.AddControllers();
-			services.AddScoped<ICatalogService>();
-			services.AddScoped<ICatalogRepository>();
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

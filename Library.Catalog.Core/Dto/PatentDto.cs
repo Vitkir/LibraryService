@@ -5,6 +5,7 @@ namespace Library.Catalog.Core.Dto
 {
 	public class PatentDto
 	{
+		public int Id { get; set; }
 		public string Name { get; set; }
 		public List<AuthorDto> Authors { get; set; }
 		public string Country { get; set; }

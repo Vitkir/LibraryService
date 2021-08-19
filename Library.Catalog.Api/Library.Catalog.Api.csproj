@@ -5,7 +5,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="10.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Library.Catalog.Core\Library.Catalog.Core.csproj" />
+    <ProjectReference Include="..\Library.Catalog.DAL\Library.Catalog.DAL.csproj" />
+    <ProjectReference Include="..\Library.Catalog.Service\Library.Catalog.Service.csproj" />
   </ItemGroup>
 
 

@@ -1,12 +1,11 @@
-﻿using System;
+﻿using Library.Catalog.Core.Dto;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Library.Catalog.Core.Contracts
 {
 	public interface ICatalogService
 	{
-		async Task<CatalogModel> SearchByNameAsync(string name)
+		Task<List<EntryDto>> SearchByNameAsync(string name);
 	}
 }

@@ -4,6 +4,7 @@ namespace Library.Catalog.Api.Models
 {
 	public class BookModel
 	{
+		public int Id { get; set; }
 		public string Name { get; set; }
 		public List<AuthorModel> Authors { get; set; }
 		public string City { get; set; }
