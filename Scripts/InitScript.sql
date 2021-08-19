@@ -127,8 +127,10 @@ CREATE TABLE [dbo].[Infos]
     [Name] NVARCHAR(300) NOT NULL, 
     [Pages] INT NOT NULL, 
     [Description] NVARCHAR(2000) NULL,
+    [TypeId] INT NOT NULL,
     [IsDeleted] BIT NOT NULL DEFAULT 0, 
     CONSTRAINT PK_Infos_Id PRIMARY KEY ([Id]),
+    CONSTRAINT [FK_Infos_TypeId] FOREIGN KEY ([TypeId]) REFERENCES [dbo].[Types] ([Id])
 );
 
 CREATE TABLE [dbo].[Countries]
@@ -277,7 +279,8 @@ GO
 CREATE VIEW [dbo].[vwCatalog]
 WITH SCHEMABINDING
 AS
-SELECT i.[Id],i.[Name],c.[City],pc.[Name] AS [Country],[Pages],[Description],[ISBN],[ISSN],bn.[Publisher],c.[Year],[RegistrationNumber],[FilingDate],[PublicationDate]  FROM [dbo].[Infos] AS i
+SELECT i.[Id],i.[Name],t.[Name] AS [Type],c.[City],pc.[Name] AS [Country],[Pages],[Description],[ISBN],[ISSN],bn.[Publisher],c.[Year],[RegistrationNumber],[FilingDate],[PublicationDate]  FROM [dbo].[Infos] AS i
+	LEFT JOIN [dbo].[Types] AS t ON i.[TypeId] = t.[Id]
 	LEFT JOIN [dbo].[Books] AS b ON i.[Id] = b.[Id]
 	LEFT JOIN [dbo].[Newspapers] AS n ON i.[Id] = n.[Id]
 	LEFT JOIN (SELECT b.[Id],p.[Name] AS [Publisher],c.[Name] AS [City] FROM [dbo].[Books] AS b
@@ -354,8 +357,8 @@ BEGIN
 
 BEGIN TRY
     BEGIN TRAN
-        INSERT INTO [dbo].[Infos]([Name],[Pages],[Description]) 
-        SELECT [Name],[Pages],[Description] FROM @book
+        INSERT INTO [dbo].[Infos]([Name],[Pages],[Description],[TypeId]) 
+        SELECT [Name],[Pages],[Description],1 FROM @book
         SET @bookId = @@IDENTITY
     
         INSERT INTO [dbo].[Cities]([Name]) 
@@ -393,8 +396,8 @@ BEGIN
 
 BEGIN TRY
     BEGIN TRAN
-        INSERT INTO [dbo].[Infos]([Name],[Pages],[Description]) 
-        SELECT [Name],[Pages],[Description] FROM @newspaper
+        INSERT INTO [dbo].[Infos]([Name],[Pages],[Description],[TypeId]) 
+        SELECT [Name],[Pages],[Description],2 FROM @newspaper
         SET @newspaperId = @@IDENTITY
 
         INSERT INTO [dbo].[Cities]([Name]) 
@@ -427,8 +430,8 @@ BEGIN
 
 BEGIN TRY
     BEGIN TRAN
-        INSERT INTO [dbo].[Infos]([Name],[Pages],[Description]) 
-        SELECT [Name],[Pages],[Description] FROM @patent
+        INSERT INTO [dbo].[Infos]([Name],[Pages],[Description],[TypeId]) 
+        SELECT [Name],[Pages],[Description],3 FROM @patent
         SET @patentId = @@IDENTITY
 
         INSERT INTO [dbo].[Countries]([Name]) 
@@ -480,6 +483,20 @@ CREATE PROCEDURE [dbo].[FindByName]
 AS
 BEGIN
 	SET NOCOUNT ON
-    SELECT * FROM [dbo].[vwCatalog]
+     SELECT * INTO #tempCatalog FROM [dbo].[vwCatalog]
     WHERE [Name] = @name
+
+    SELECT * FROM #tempCatalog
+    
+    SELECT [InfoId],[AuthorId] FROM #tempCatalog AS i
+    JOIN [dbo].[InfoAuthors] AS ia ON i.[Id] = ia.[InfoId]
+
+    SELECT a.[Id],a.[Name],a.[Surname] FROM #tempCatalog AS i
+    JOIN [dbo].[InfoAuthors] AS ia ON i.[Id] = ia.[InfoId]
+    JOIN [dbo].[Authors] AS a ON ia.[AuthorId] = a.[Id]
 END
+GO
+
+INSERT INTO [dbo].[Types]([Name]) VALUES('Book')
+INSERT INTO [dbo].[Types]([Name]) VALUES('Newspaper')
+INSERT INTO [dbo].[Types]([Name]) VALUES('Patent')
